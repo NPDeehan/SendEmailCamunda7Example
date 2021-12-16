@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 2,
+  "components": [
+    {
+      "text": "# Enter Email Details",
+      "type": "text",
+      "id": "Field_0azvslw"
+    },
+    {
+      "label": "Sender Email",
+      "type": "textfield",
+      "id": "Field_1s3ggr3",
+      "key": "sender",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Email Receiver",
+      "type": "textfield",
+      "id": "Field_0n6b5p2",
+      "key": "receiver",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Subject",
+      "type": "textfield",
+      "id": "Field_05jh9gm",
+      "key": "subject",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Email Body",
+      "type": "textfield",
+      "id": "Field_02fxlcu",
+      "key": "body"
+    }
+  ],
+  "type": "default",
+  "id": "EmailDetailsForm"
+}
