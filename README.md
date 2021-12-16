@@ -65,4 +65,4 @@ If you use this worker for any process but i've included a demo process to make 
 You just need to download the Camunda Modeler and open the `./ExampleProcess/SendEmailExample.bpmn` file. You can then deploy this file directly from the modeler. To do this click on the deploy button at the bottom and make sure you add the `EmailDetailsForm.form` to the deployment. This is in the same folder as the model. 
 
 If you've deployed it successfully you should be able to go to
-`
+`http://localhost:8080/camunda/app/tasklist/default/` log in with `demo/demo` and then you can start the process, complete the form and the email should be sent out.
