@@ -28,6 +28,8 @@ import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,24 +45,45 @@ public class SendEmailHandler implements ExternalTaskHandler {
     MailDetails mailDetails = getMailDetails(externalTask);
     Logger.getLogger("Send Email")
             .log(Level.INFO, "Mail Details: "+" Sender: " + mailDetails.getSender() + " Receiver: " + mailDetails.getReceiver());
-    try {
-      sendMail(mailDetails.getSender(), mailDetails.getReceiver(), mailDetails.getSubject(), mailDetails.getBody());
-      // complete the external task
-      Logger.getLogger("Send Email")
-              .log(Level.INFO, "Email Is Sent");
-      externalTaskService.complete(externalTask);
+    // Validate the email addresses
+    List<String> invalidEmailAddresses = new ArrayList();
+    boolean invalidEmails = false;
 
-    } catch (MessagingException e) {
-      e.printStackTrace();
-      externalTaskService.handleFailure(externalTask, "Email not Sent!", e.getMessage(), 0, 0);
-      Logger.getLogger("Send Email")
-              .log(Level.INFO, "Email Failed to Send");
+    if(!ValidateEmail.isValidEmail(mailDetails.getSender())){
+      invalidEmailAddresses.add(mailDetails.getSender());
+      invalidEmails = true;
     }
+    if(!ValidateEmail.isValidEmail(mailDetails.getReceiver())){
+      invalidEmailAddresses.add(mailDetails.getReceiver());
+      invalidEmails = true;
+    }
+    if(invalidEmails)
+    {
+      externalTaskService.handleBpmnError(externalTask, "INVALID_EMAIL",
+              "The email address(s) " + invalidEmailAddresses + " found to be invalid");
 
-    // we could call an external service to create the loan documents here
+    }else {
 
-    Logger.getLogger("Send Email")
-        .log(Level.INFO, "Email Worker has Finished");
+      // If both emails are valid we will try to send the email
+      try {
+        sendMail(mailDetails.getSender(), mailDetails.getReceiver(), mailDetails.getSubject(), mailDetails.getBody());
+        // complete the external task
+        Logger.getLogger("Send Email")
+                .log(Level.INFO, "Email Is Sent");
+        externalTaskService.complete(externalTask);
+
+      } catch (MessagingException e) {
+        e.printStackTrace();
+        externalTaskService.handleFailure(externalTask, "Email not Sent!", e.getMessage(), 0, 0);
+        Logger.getLogger("Send Email")
+                .log(Level.INFO, "Email Failed to Send");
+      }
+
+      // we could call an external service to create the loan documents here
+
+      Logger.getLogger("Send Email")
+              .log(Level.INFO, "Email Worker has Finished");
+    }
   }
 
   private MailDetails getMailDetails(ExternalTask externalTask) {

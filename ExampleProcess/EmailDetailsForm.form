@@ -38,6 +38,13 @@
       "type": "textfield",
       "id": "Field_02fxlcu",
       "key": "body"
+    },
+    {
+      "label": "System Message",
+      "type": "textfield",
+      "id": "Field_1bfhr21",
+      "key": "message",
+      "description": "If there is a message from the system it'll appear here. "
     }
   ],
   "type": "default",

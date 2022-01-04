@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1vr5btq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:process id="SendEmailExample" name="Send Email Example" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1" name="Send Email to User" camunda:formRef="EmailDetailsForm" camunda:formRefBinding="deployment">
+    <bpmn:startEvent id="StartEvent_1" name="Send Email to User" camunda:formRef="EmailDetailsForm" camunda:formRefBinding="deployment" camunda:initiator="userName">
       <bpmn:outgoing>Flow_1y05req</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1y05req" sourceRef="StartEvent_1" targetRef="Activity_0gjh9ch" />
@@ -11,33 +11,65 @@
     <bpmn:sequenceFlow id="Flow_18aqo3x" sourceRef="Activity_0gjh9ch" targetRef="Event_1bwkxxl" />
     <bpmn:serviceTask id="Activity_0gjh9ch" name="Send Email" camunda:type="external" camunda:topic="SendEmail">
       <bpmn:incoming>Flow_1y05req</bpmn:incoming>
+      <bpmn:incoming>Flow_07fazr6</bpmn:incoming>
       <bpmn:outgoing>Flow_18aqo3x</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Event_1vyv8x6" name="Email Invalid" attachedToRef="Activity_0gjh9ch">
+      <bpmn:outgoing>Flow_1cqaogl</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_05qrlpe" errorRef="Error_1v5ip3e" camunda:errorMessageVariable="message" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1cqaogl" sourceRef="Event_1vyv8x6" targetRef="Activity_1t5ah0i" />
+    <bpmn:sequenceFlow id="Flow_07fazr6" sourceRef="Activity_1t5ah0i" targetRef="Activity_0gjh9ch" />
+    <bpmn:userTask id="Activity_1t5ah0i" name="Correct Email Address" camunda:formRef="EmailDetailsForm" camunda:formRefBinding="deployment" camunda:assignee="#{userName}">
+      <bpmn:incoming>Flow_1cqaogl</bpmn:incoming>
+      <bpmn:outgoing>Flow_07fazr6</bpmn:outgoing>
+    </bpmn:userTask>
   </bpmn:process>
+  <bpmn:error id="Error_1v5ip3e" name="INVALID_EMAIL" errorCode="INVALID_EMAIL" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SendEmailExample">
-      <bpmndi:BPMNEdge id="Flow_1y05req_di" bpmnElement="Flow_1y05req">
-        <di:waypoint x="215" y="117" />
-        <di:waypoint x="270" y="117" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_18aqo3x_di" bpmnElement="Flow_18aqo3x">
-        <di:waypoint x="370" y="117" />
-        <di:waypoint x="432" y="117" />
+        <di:waypoint x="370" y="267" />
+        <di:waypoint x="582" y="267" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1y05req_di" bpmnElement="Flow_1y05req">
+        <di:waypoint x="215" y="267" />
+        <di:waypoint x="270" y="267" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cqaogl_di" bpmnElement="Flow_1cqaogl">
+        <di:waypoint x="370" y="209" />
+        <di:waypoint x="370" y="140" />
+        <di:waypoint x="410" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07fazr6_di" bpmnElement="Flow_07fazr6">
+        <di:waypoint x="460" y="100" />
+        <di:waypoint x="460" y="80" />
+        <di:waypoint x="320" y="80" />
+        <di:waypoint x="320" y="227" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="179" y="99" width="36" height="36" />
+        <dc:Bounds x="179" y="249" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="163" y="142" width="69" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1bwkxxl_di" bpmnElement="Event_1bwkxxl">
-        <dc:Bounds x="432" y="99" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="423" y="142" width="55" height="14" />
+          <dc:Bounds x="163" y="292" width="69" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1hldyot_di" bpmnElement="Activity_0gjh9ch">
-        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <dc:Bounds x="270" y="227" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gpsrc4_di" bpmnElement="Activity_1t5ah0i">
+        <dc:Bounds x="410" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bwkxxl_di" bpmnElement="Event_1bwkxxl">
+        <dc:Bounds x="582" y="249" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="573" y="292" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1m3m5it_di" bpmnElement="Event_1vyv8x6">
+        <dc:Bounds x="352" y="209" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="388" y="203" width="63" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
