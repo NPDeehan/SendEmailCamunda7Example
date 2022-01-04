@@ -29,16 +29,42 @@ It work by subscribing to a *Topic* and when tasks for that topic are picked up 
 
 when it starts up it will send a request to Camunda asking for any tasks with that topic. 
 
-When it finds one it will attempt to send an email. if successful it will return with
+When it finds one it will attempt to send an email. 
+
+There are three possible outcomes if the works tries to send an email. 
+
+1. **Email Send Successfully**
+
+If nothing goes wrong and the email is successfully send the worker will contact the engine to say that the task has been completed with the following method
 
 ```java
 externalTaskService.complete(externalTask);
 ```
 
-If an error occurs it will return with a failure
+2. **Email Address is invalid**
+
+The worker runs some basic validation on the sending and reiving email addresses and if either of those are found to be invalid it tells the Engine that throwing BPMN Error which can be caught so that a user can manually correct the email address. This done with the following method
+
+```Java
+externalTaskService.handleBpmnError(externalTask, 
+          "INVALID_EMAIL",
+          "The email address(s) " + 
+          invalidEmailAddresses + 
+          " found to be invalid");
+```
+
+The method not only throws a specific error called `INVALID_EMAIL` but it also sends a message containing a list of the invalid email addresses that it's found. 
+
+3. **Email fails to send for technical reason**
+
+If a technical error occurs, (e.g. the email server is down) it will return with a failure. This is a way of alerting an admin to the problem by telling the engine to create an incident. 
 
 ```java
- externalTaskService.handleFailure(externalTask, "Email not Sent!", e.getMessage(), 0, 0);
+ externalTaskService.handleFailure(externalTask, 
+        "Email not Sent!", 
+        e.getMessage(), 
+        0, 
+        0);
 ```  
 
 The configuration for the worker is all contained in the `application.yml` file and before you start up the worker you need to add some additional configuration to it so that it can send out an email.
@@ -59,6 +85,8 @@ Once you're added the details of your email server you can run the `Application.
 The worker will then connect to Camunda looking for work related to the `SendEmail` Topic
 
 ### **Deploy Email Process**
+
+![alt](./ExampleProcess/SendEmailExample.png)
 
 If you use this worker for any process but i've included a demo process to make it easy to test it out.
 
